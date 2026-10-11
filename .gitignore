@@ -1,0 +1,7 @@
+.typst-cache/
+*.pdf
+*.png
+!results/**/*.pdf
+!results/**/*.png
+!assets/**/*.png
+!assets/**/*.pdf
