@@ -2,13 +2,16 @@ FROM debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Times New Roman лежит в non-free (ttf-mscorefonts-installer).
+RUN sed -i 's/Components: main/Components: main contrib non-free/' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates \
         wget \
         xz-utils \
         fontconfig \
         fonts-liberation \
         graphviz \
+        zip \
         debconf \
     && echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" \
         | debconf-set-selections \

@@ -30,6 +30,8 @@
   set page(margin: margin)
 
   // ГОСТ 7.32: Times New Roman. Liberation Serif — запасной метрический аналог.
+  // Файлы Liberation лежат в fonts/ и подхватываются typst.app; локально
+  // сначала берётся системный Times New Roman, если он установлен.
   set text(
     font: ("Times New Roman", "Liberation Serif"),
     size: text-size,

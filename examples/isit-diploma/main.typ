@@ -1,4 +1,4 @@
-#import "/src/export.typ": abstract, appendix-heading, appendixes, custom-title-template, gost
+#import "../../src/export.typ": abstract, appendix-heading, appendixes, custom-title-template, gost
 #import custom-title-template: from-module
 #import "isit-diploma.typ" as isit
 #import "endnotes.typ": endnotes

@@ -11,7 +11,7 @@
 }
 
 #let endnotes() = {
-  import "/src/component/headings.typ": structural-heading-titles
+  import "../../src/component/headings.typ": structural-heading-titles
   heading(structural-heading-titles.notes)
   context {
     let ns = notes.get()

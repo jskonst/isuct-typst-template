@@ -12,17 +12,20 @@
 
 ## Сборка из командной строки
 
-Нужен [Typst 0.14](https://github.com/typst/typst/releases) (проверялось на 0.14.2). Для схемы в главе 3 ещё нужна программа `dot` из [Graphviz](https://graphviz.org/). Шрифт бланка — Times New Roman; если его нет, подставляется Liberation Serif (латиница совпадает по метрикам, кириллица может чуть сдвинуть переносы).
+Нужен [Typst 0.14](https://github.com/typst/typst/releases) (проверялось на 0.14.2). Шрифт бланка — Times New Roman; если его нет, подставляется Liberation Serif из системы или из каталога `fonts/` (латиница совпадает по метрикам, кириллица может чуть сдвинуть переносы). Схема DOT в главе 3 рисуется пакетом diagraph: это WASM-модуль, отдельная программа `dot` не нужна.
 
 ```bash
 # диплом: титул, задание, главы, сноски, источники
 typst compile --root . examples/isit-diploma/main.typ results/example.pdf
 
+# то же самое: main.typ в корне подключает пример
+typst compile --root . main.typ results/example.pdf
+
 # короткий отчёт без бланка кафедры
 typst compile --root . template/main.typ results/generic-report.pdf
 ```
 
-Ключ `--root .` обязателен: главы импортируют шаблон как `/src/export.typ`.
+Импорты относительные (`../../src/export.typ` и рядом). Абсолютных путей вида `/src/...` в проекте нет, локальных пакетов `@local` тоже. Ключ `--root .` в этих командах оставлен: с относительными импортами сборка от него не зависит.
 
 Скрипт делает то же самое и, если есть `pdftoppm`, обновляет PNG страниц:
 
@@ -42,7 +45,34 @@ docker run --rm -v "$PWD":/work -w /work isuct-gost \
   compile --root . examples/isit-diploma/main.typ results/example.pdf
 ```
 
-Без аргументов образ выполняет ту же команду `compile` для примера.
+Без аргументов образ выполняет ту же команду `compile` для примера. В образе есть `zip`, поэтому там же собирается архив для typst.app:
+
+```bash
+docker run --rm --entrypoint bash -v "$PWD":/work -w /work isuct-gost \
+  ./scripts/make-typst-app-zip.sh
+```
+
+## Проект на typst.app
+
+Веб-приложение не видит шрифты и программы вашего компьютера. Архив `dist/isuct-typst-app.zip` содержит только файлы проекта: точку входа, шаблон, пример, шрифт и лицензию. Его же собирает скрипт:
+
+```bash
+./scripts/make-typst-app-zip.sh
+```
+
+Как загрузить проект:
+
+1. Откройте [typst.app](https://typst.app) и создайте пустой проект (кнопка нового проекта на панели, не шаблон из Universe).
+2. Скачайте `dist/isuct-typst-app.zip` из репозитория или соберите его командой выше.
+3. Распакуйте архив у себя на диске. В корень должны лечь `main.typ`, каталоги `src`, `examples`, `fonts`, `template` и файл `LICENSE`.
+4. В редакторе откройте панель файлов и перетащите туда это содержимое. Сам zip веб-приложение не распаковывает: если бросить архив как один файл, сборка его не увидит. Папки нужно сохранить папками, а не россыпью файлов в корне.
+5. Откройте `main.typ` и включите его предпросмотр. Это выпускная работа: титул, задание и главы. Короткий отчёт без бланка кафедры — `template/main.typ`, его можно открыть отдельно.
+
+Шрифт. В `fonts/` лежит Liberation Serif (лицензия SIL OFL, текст в `fonts/OFL.txt`): обычное, жирное, курсив и жирный курсив. typst.app сам находит `.ttf` и `.otf` в проекте, в том числе во вложенной папке, и ставит их выше шрифтов сервера. В шаблоне порядок семейств такой: сначала Times New Roman, затем Liberation Serif. Times New Roman на сервере нет, поэтому подставится Liberation Serif. Латиница у него метрически совпадает с Times, кириллица может чуть сдвинуть переносы. Свои файлы Times New Roman в репозиторий не входят (это шрифт Microsoft). Если они у вас есть, загрузите `.ttf` в `fonts/`: семейство стоит первым в списке и перекроет Liberation Serif.
+
+Схемы Fletcher, CeTZ и diagraph подключаются как `@preview/...` из Typst Universe. В веб-приложении они доступны без локальной установки. diagraph рисует DOT своим WASM-модулем и не вызывает системную программу `dot`. Подписи внутри этой схемы просят семейство Times New Roman. Если его в проекте нет, для подписей схемы Typst берёт встроенный шрифт, а весь остальной текст остаётся Liberation Serif.
+
+Ограничение Mermaid. Компилятор Typst, и локальный, и typst.app, не исполняет JavaScript, поэтому текст `examples/isit-diploma/diagrams/sequence.mmd` сам в рисунок не превращается. В проект уже положен готовый `sequence.svg`, и пример ссылается на него. Чтобы перерисовать SVG, нужен локальный `mmdc` и `./scripts/render-mermaid.sh`. Этого скрипта в архиве для typst.app нет.
 
 ## Как заполнить титульный лист и задание
 
@@ -148,10 +178,10 @@ $ H = sum_(i=1)^n k_i h_i , $ <eq-hours>
 | --- | --- | --- |
 | [Fletcher](https://typst.app/universe/package/fletcher) 0.5.8 | глава 2, `03-koncepciya.typ` | ничего, пакет качается в кэш |
 | [CeTZ](https://typst.app/universe/package/cetz) 0.5.2 | глава 2, тот же файл | ничего |
-| [diagraph](https://typst.app/universe/package/diagraph) 0.3.7, язык DOT | глава 3, `04-tz.typ` | программа `dot` (Graphviz) на машине сборки |
+| [diagraph](https://typst.app/universe/package/diagraph) 0.3.7, язык DOT | глава 3, `04-tz.typ` | ничего: пакет сам содержит WASM-модуль Graphviz |
 | Mermaid | `diagrams/sequence.mmd` и SVG рядом | компилятор Typst Mermaid не исполняет: нет JavaScript |
 
-Fletcher короче для блок-схем из узлов и стрелок. CeTZ — холст с координатами, когда важны размеры. DOT удобен, если схема уже написана для Graphviz; без `dot` глава с `raw-render` не соберётся. Русские подписи в DOT задают `fontname="Times New Roman"`.
+Fletcher короче для блок-схем из узлов и стрелок. CeTZ — холст с координатами, когда важны размеры. DOT удобен, если схема уже написана для Graphviz; `raw-render` вызывает WASM-модуль diagraph, а не системную программу `dot`. Русские подписи в DOT задают `fontname="Times New Roman"`.
 
 Mermaid оставлен как текст `examples/isit-diploma/diagrams/sequence.mmd`. Рядом лежит готовый `sequence.svg`, поэтому пример собирается без Node.js. Чтобы перерисовать SVG:
 
@@ -180,9 +210,12 @@ npm install -g @mermaid-js/mermaid-cli
 
 ## Состав репозитория
 
+- `main.typ` — точка входа: выпускная работа.
 - `src/` — ядро ГОСТ 7.32 (шрифт Times New Roman с запасным Liberation Serif, город на титуле, заголовок «Примечания»).
 - `examples/isit-diploma/` — бланки, нумерация, сноски, главы, библиография, схемы.
 - `template/main.typ` — короткий отчёт без бланка кафедры.
+- `fonts/` — Liberation Serif (OFL) для typst.app.
+- `dist/isuct-typst-app.zip` — тот же проект, упакованный для загрузки в веб-приложение.
 - `reference/` — исходные docx.
 - `results/` — собранный PDF и картинки страниц.
 

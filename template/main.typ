@@ -1,4 +1,4 @@
-#import "/src/export.typ": abstract, gost
+#import "../src/export.typ": abstract, gost
 
 // Короткий отчёт без бланка ИГХТУ. Дипломный пример —
 // examples/isit-diploma/main.typ.
