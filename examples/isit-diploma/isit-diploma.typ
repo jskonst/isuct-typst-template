@@ -336,6 +336,7 @@
 ) = {
   set text(font: serif, size: 12pt, lang: "ru", hyphenate: false)
   set par(leading: a-gap, spacing: a-gap, justify: false, first-line-indent: 0pt)
+  [#metadata(none) <isuct-assignment-start>]
 
   a-line(weight: "bold")[Министерство науки и высшего образования Российской Федерации]
   blanks(1, pitch: a-pitch)
@@ -486,7 +487,15 @@
     header: none,
     footer: context {
       set text(font: serif, size: 12pt)
-      align(center, counter(page).display())
+      let starts = query(<isuct-assignment-start>)
+      let on-first = (
+        starts.len() > 0
+          and counter(page).get().first() == starts.first().location().page()
+      )
+      // Первая страница задания входит в счёт, но номер внизу не печатается.
+      if not on-first {
+        align(center, counter(page).display())
+      }
     },
   )
 

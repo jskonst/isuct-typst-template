@@ -12,8 +12,11 @@
   notes: [Примечания],
 )
 
-#let structure-heading-style = it => {
-  align(center)[#upper(it)]
+// ГОСТ 7.32-2017, п. 6.2.1: структурный элемент — по центру, прописными,
+// без точки в конце и без подчёркивания. Жирным ГОСТ его не задаёт.
+#let structure-heading-style(it) = {
+  set text(weight: "regular")
+  align(center, upper(it.body))
 }
 
 #let structure-heading(body) = {
@@ -21,15 +24,42 @@
 }
 
 #let headings(text-size, indent, add-pagebreaks) = body => {
-  show heading: set text(size: text-size)
-  set heading(numbering: "1.1")
+  show heading: set text(size: text-size, weight: "regular")
+  // Точка после номера: «1.» и «1.1.».
+  set heading(numbering: "1.1.")
 
+  let structural-heading = structural-heading-titles
+    .values()
+    .fold(selector, (acc, i) => acc.or(heading.where(body: i, level: 1)))
+
+  show structural-heading: set heading(numbering: none)
+
+  // Раздел и подраздел — с абзацного отступа, без жирного (ГОСТ 7.32, п. 6.5.1).
+  // Название раздела печатается прописными.
   show heading: it => {
-    if it.body not in structural-heading-titles.values() {
-      pad(it, left: indent)
+    set text(weight: "regular", size: text-size)
+    set par(first-line-indent: 0pt, justify: false)
+    let titled = if it.level == 1 and it.numbering != none {
+      upper(it.body)
     } else {
-      it
+      it.body
     }
+    let line = if it.numbering != none {
+      context {
+        numbering(it.numbering, ..counter(heading).get())
+        [ ]
+        titled
+      }
+    } else {
+      titled
+    }
+    block(
+      width: 100%,
+      above: default-heading-margin.above,
+      below: default-heading-margin.below,
+      breakable: false,
+      pad(left: indent, line),
+    )
   }
 
   show heading.where(level: 1): it => {
@@ -39,19 +69,20 @@
     it
   }
 
-  let structural-heading = structural-heading-titles
-    .values()
-    .fold(selector, (acc, i) => acc.or(heading.where(body: i, level: 1)))
-
-  show structural-heading: set heading(numbering: none)
   show structural-heading: it => {
     if add-pagebreaks {
       pagebreak(weak: true)
     }
-    structure-heading-style(it)
+    set text(weight: "regular", size: text-size)
+    set par(first-line-indent: 0pt, justify: false)
+    block(
+      width: 100%,
+      above: default-heading-margin.above,
+      below: default-heading-margin.below,
+      breakable: false,
+      structure-heading-style(it),
+    )
   }
-
-  show heading: set block(..default-heading-margin)
 
   body
 }

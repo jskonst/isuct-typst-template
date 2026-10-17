@@ -10,6 +10,28 @@
   if el.kind == table { table } else { image }
 }
 
+// Строчная форма — середина предложения, прописная — его начало.
+#let figure-ref-word(kind, capital) = {
+  if kind == table {
+    if capital [Табл.] else [табл.]
+  } else {
+    if capital [Рис.] else [рис.]
+  }
+}
+
+// Ссылка в начале предложения: «Табл. 1.1», «Рис. 2.1».
+// Обычная `@label` остаётся строчной. Формула в обоих случаях — «(1.1)».
+#let Ref(target) = {
+  context {
+    let el = query(target).first()
+    if el.func() == figure {
+      ref(target, supplement: figure-ref-word(figure-kind(el), true))
+    } else {
+      ref(target)
+    }
+  }
+}
+
 #let gost-numbering(body) = {
   set figure(numbering: n => context {
     let ch = counter(heading).get().at(0, default: 1)
@@ -36,7 +58,13 @@
       it
     } else if el.func() == figure {
       let kind = figure-kind(el)
-      let supplement = if kind == table [Таблица] else [Рисунок]
+      // `none` — значение по умолчанию после `set ref(supplement: none)`.
+      // Явный supplement (в том числе из `Ref`) подставляется как есть.
+      let supplement = if it.supplement == auto or it.supplement == none {
+        figure-ref-word(kind, false)
+      } else {
+        it.supplement
+      }
       context {
         let loc = el.location()
         let ch = chapter-at(loc)

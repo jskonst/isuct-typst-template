@@ -49,13 +49,24 @@
 
   set outline(indent: indent, depth: default-outline-depth)
   show outline: set block(below: indent / 2)
+  show outline.entry: set text(weight: "regular")
   show outline.entry: it => {
     show linebreak: [ ]
     if is-heading-in-appendix(it.element) {
-      let body = it.element.body
       link(it.element.location(), it.indented(
         none,
         [Приложение #it.prefix() #it.element.body]
+          + sym.space
+          + box(width: 1fr, it.fill)
+          + sym.space
+          + sym.wj
+          + it.page(),
+      ))
+    } else if it.level == 1 {
+      // Номер с точкой, как у заголовка; название раздела — прописными.
+      link(it.element.location(), it.indented(
+        it.prefix(),
+        upper(it.element.body)
           + sym.space
           + box(width: 1fr, it.fill)
           + sym.space
