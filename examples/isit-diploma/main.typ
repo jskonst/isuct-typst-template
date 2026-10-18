@@ -78,24 +78,27 @@
 #import "numbering.typ": gost-numbering
 #show: gost-numbering
 
+// Листинги в главах — образец исходника, их кегль меньше основного текста.
+#show raw.where(block: true): set text(size: 10pt)
+
 #abstract(
-  "выпускная квалификационная работа",
-  "педагогическая нагрузка",
-  "веб-приложение",
-  "перекрёстная ссылка",
-  "концевая сноска",
+  "шаблон",
+  "ГОСТ 7.32",
+  "Typst",
+  "титульный лист",
+  "задание",
 )[
-  Пример показывает бланки титульного листа и задания ИГХТУ и основной текст по ГОСТ 7.32. В главах разобраны ссылки на таблицы, рисунки и формулы, концевые сноски и схемы, записанные в исходнике.
+  Пример заполняет бланки ИГХТУ и показывает, как набирать основной текст. Рядом с каждым результатом приведён исходник на Typst. Титульный лист и задание оставлены как в образцах Word.
 ]
 
 #outline()
 
 #include "chapters/01-vvedenie.typ"
-#include "chapters/02-trebovaniya.typ"
-#include "chapters/03-koncepciya.typ"
-#include "chapters/04-tz.typ"
-#include "chapters/05-proekt.typ"
-#include "chapters/06-dokumentaciya.typ"
+#include "chapters/02-blanki-i-tekst.typ"
+#include "chapters/03-obekty.typ"
+#include "chapters/04-istochniki.typ"
+#include "chapters/05-shemy.typ"
+#include "chapters/06-oshibki.typ"
 #include "chapters/07-zaklyuchenie.typ"
 
 #endnotes()
@@ -106,6 +109,6 @@
 
 #appendix-heading("справочное")[Порядок проверки сборки]
 
-Приложение не входит в нумерацию глав. Заголовок получает букву.
+Приложение не входит в нумерацию глав и получает букву. Этот заголовок задан вызовом `#appendix-heading` после `#show: appendixes`.
 
-Для повторной сборки из корня репозитория достаточно Typst и, если нужна схема DOT, программы `dot` из Graphviz. Mermaid в компиляцию не входит: используется готовый SVG `examples/isit-diploma/diagrams/sequence.svg`.
+Повторная сборка из корня репозитория: `typst compile --root . examples/isit-diploma/main.typ results/example.pdf`. На typst.app откройте корневой `main.typ`. Схема DOT собирается пакетом diagraph, отдельная программа `dot` не нужна. Mermaid в компиляцию не входит: используется готовый SVG `examples/isit-diploma/diagrams/sequence.svg`.

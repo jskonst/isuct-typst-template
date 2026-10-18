@@ -4,15 +4,15 @@
 
 Готовый пример можно открыть без сборки:
 
-- [results/example.pdf](results/example.pdf) — выпускная работа, 16 страниц;
+- [results/example.pdf](results/example.pdf) — выпускная работа: бланки и краткая инструкция по набору;
 - [results/pages/](results/pages/) — те же страницы в PNG;
 - [results/comparison/](results/comparison/) — бланк Word рядом с Typst и прежний макет рядом с текущим.
 
-Пример собирает два разных бланка, как в исходных файлах Word. Титульный лист — П. А. Денисова, тема про транспортное страхование. Задание — О. Р. Лифанов, тема про учёт педагогической нагрузки. Главы написаны по теме задания и прямо говорят, почему на титуле другой студент.
+Пример собирает два разных бланка, как в исходных файлах Word. Титульный лист — П. А. Денисова, тема про транспортное страхование. Задание — О. Р. Лифанов, тема про учёт педагогической нагрузки. Главы после бланков — инструкция студенту: у каждого приёма рядом стоят листинг и результат.
 
 ## Сборка из командной строки
 
-Нужен [Typst 0.14](https://github.com/typst/typst/releases) (проверялось на 0.14.2). Шрифт бланка — Times New Roman; если его нет, подставляется Liberation Serif из системы или из каталога `fonts/` (латиница совпадает по метрикам, кириллица может чуть сдвинуть переносы). Схема DOT в главе 3 рисуется пакетом diagraph: это WASM-модуль, отдельная программа `dot` не нужна.
+Нужен [Typst 0.14](https://github.com/typst/typst/releases) (проверялось на 0.14.2). Шрифт бланка — Times New Roman; если его нет, подставляется Liberation Serif из системы или из каталога `fonts/` (латиница совпадает по метрикам, кириллица может чуть сдвинуть переносы). Схема DOT в `chapters/05-shemy.typ` рисуется пакетом diagraph: это WASM-модуль, отдельная программа `dot` не нужна.
 
 ```bash
 # диплом: титул, задание, главы, сноски, источники
@@ -176,9 +176,9 @@ $ H = sum_(i=1)^n k_i h_i , $ <eq-hours>
 
 | Способ | Где смотреть | Что нужно кроме Typst |
 | --- | --- | --- |
-| [Fletcher](https://typst.app/universe/package/fletcher) 0.5.8 | глава 2, `03-koncepciya.typ` | ничего, пакет качается в кэш |
-| [CeTZ](https://typst.app/universe/package/cetz) 0.5.2 | глава 2, тот же файл | ничего |
-| [diagraph](https://typst.app/universe/package/diagraph) 0.3.7, язык DOT | глава 3, `04-tz.typ` | ничего: пакет сам содержит WASM-модуль Graphviz |
+| [Fletcher](https://typst.app/universe/package/fletcher) 0.5.8 | `chapters/05-shemy.typ` | ничего, пакет качается в кэш |
+| [CeTZ](https://typst.app/universe/package/cetz) 0.5.2 | тот же файл | ничего |
+| [diagraph](https://typst.app/universe/package/diagraph) 0.3.7, язык DOT | тот же файл | ничего: пакет сам содержит WASM-модуль Graphviz |
 | Mermaid | `diagrams/sequence.mmd` и SVG рядом | компилятор Typst Mermaid не исполняет: нет JavaScript |
 
 Fletcher короче для блок-схем из узлов и стрелок. CeTZ — холст с координатами, когда важны размеры. DOT удобен, если схема уже написана для Graphviz; `raw-render` вызывает WASM-модуль diagraph, а не системную программу `dot`. Русские подписи в DOT задают `fontname="Times New Roman"`.
