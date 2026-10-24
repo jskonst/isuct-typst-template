@@ -39,7 +39,7 @@ docker build -t isuct-typst . && docker run --rm -v "$PWD:/work" isuct-typst
 ```
 
 ## Проверка
-1. `./scripts/check.sh` должен проходить.
+1. `./scripts/check.sh` должен проходить (его же запускает CI: `.github/workflows/build.yml` на push/PR в `main`; PDF примера — artifact `isit-diploma-example-pdf`; на тег `v*` PDF и `dist/isuct-typst-app.zip` прикладываются к релизу).
 2. Отрендерить страницы: `pdftoppm -png -r 110 results/example.pdf results/pages/page` и посмотреть изменённые страницы.
 3. Если трогали титул или «Задание» — сравнить со `results/comparison/*.png` (`scripts/make-comparison.py`).
 

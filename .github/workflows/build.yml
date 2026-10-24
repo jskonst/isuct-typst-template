@@ -1,0 +1,52 @@
+name: build
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  typst:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.14.2
+      - name: Проверка (пример + короткий отчёт, без предупреждений)
+        run: ./scripts/check.sh
+      - name: Сборка PDF примера
+        run: typst compile --root . --font-path fonts examples/isit-diploma/main.typ isit-diploma-example.pdf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: isit-diploma-example-pdf
+          path: isit-diploma-example.pdf
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release'
+    needs: typst
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.14.2
+      - name: Сборка PDF и zip для typst.app
+        run: |
+          typst compile --root . --font-path fonts examples/isit-diploma/main.typ isit-diploma-example.pdf
+          ./scripts/make-typst-app-zip.sh
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name || github.ref_name }}
+          files: |
+            isit-diploma-example.pdf
+            dist/isuct-typst-app.zip
