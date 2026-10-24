@@ -12,11 +12,12 @@
   notes: [Примечания],
 )
 
-// ГОСТ 7.32-2017, п. 6.2.1: структурный элемент — по центру, прописными,
-// без точки в конце и без подчёркивания. Жирным ГОСТ его не задаёт.
-#let structure-heading-style(it) = {
+// Структурный элемент (ВВЕДЕНИЕ, ЗАКЛЮЧЕНИЕ и т. п.) оформляется так же, как
+// нумерованный раздел: слева с абзацного отступа, прописными, без точки
+// в конце и без жирного (требование кафедры).
+#let structure-heading-style(it, indent: 1.25cm) = {
   set text(weight: "regular")
-  align(center, upper(it.body))
+  align(left, pad(left: indent, upper(it.body)))
 }
 
 #let structure-heading(body) = {
@@ -80,7 +81,7 @@
       above: default-heading-margin.above,
       below: default-heading-margin.below,
       breakable: false,
-      structure-heading-style(it),
+      structure-heading-style(it, indent: indent),
     )
   }
 

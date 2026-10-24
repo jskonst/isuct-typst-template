@@ -19,19 +19,20 @@
 #let appendixes(content) = {
   set heading(numbering: heading-numbering, hanging-indent: 0pt)
 
-  show heading: set align(center)
+  show heading: set align(left)
   show heading: it => {
     assert(
       it.numbering != none,
       message: "В приложениях не может быть структурных заголовков или заголовков без нумерации",
     )
     counter("appendix").step()
-    block[#upper([приложение]) #numbering(
+    set text(weight: "regular")
+    block(width: 100%, pad(left: 1.25cm)[#upper([приложение]) #numbering(
         it.numbering,
         ..counter(heading).at(
           it.location(),
         ),
-      ) \ #text(weight: "medium")[#it.body]]
+      ) \ #it.body])
   }
 
   show heading.where(level: 1): it => context {
