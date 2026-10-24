@@ -10,7 +10,9 @@ for src in examples/isit-diploma/main.typ template/main.typ; do
   if ! typst compile --root . --font-path fonts "$src" "$tmp/out.pdf" 2>"$log"; then
     cat "$log" >&2; echo "ОШИБКА: $src" >&2; status=1; continue
   fi
-  if grep -q "warning" "$log"; then
+  # «unknown font family: times new roman» — ожидаемый откат на Liberation Serif
+  # из fonts/ (в CI и typst.app Times New Roman нет); остальные предупреждения — ошибка.
+  if grep "^warning" "$log" | grep -qv "unknown font family: times new roman"; then
     cat "$log" >&2; echo "ПРЕДУПРЕЖДЕНИЯ: $src" >&2; status=1
   else
     echo "OK: $src"
