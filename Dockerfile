@@ -30,8 +30,10 @@ COPY . /work
 
 # Прогрев кэша пакетов Fletcher, CeTZ и diagraph.
 RUN typst compile --root . examples/isit-diploma/main.typ /tmp/isuct-example.pdf \
+    && typst compile --root . examples/kursovoy/main.typ /tmp/isuct-kursovoy.pdf \
+    && typst compile --root . examples/nir/main.typ /tmp/isuct-nir.pdf \
     && typst compile --root . template/main.typ /tmp/isuct-generic.pdf \
-    && rm -f /tmp/isuct-example.pdf /tmp/isuct-generic.pdf
+    && rm -f /tmp/isuct-example.pdf /tmp/isuct-kursovoy.pdf /tmp/isuct-nir.pdf /tmp/isuct-generic.pdf
 
 ENTRYPOINT ["typst"]
 CMD ["compile", "--root", ".", "examples/isit-diploma/main.typ", "results/example.pdf"]

@@ -33,7 +33,7 @@ trap 'rm -f "$tmp"' EXIT
 # Список стабильный, без лишних атрибутов zip.
 {
   printf '%s\n' main.typ template/main.typ LICENSE
-  find src examples/isit-diploma fonts -type f \
+  find src examples fonts -type f \
     ! -name '*.pdf' \
     ! -name '.DS_Store' \
     | sort

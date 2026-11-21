@@ -5,3 +5,4 @@
 #import "component/headings.typ": structure-heading
 #import "component/custom-title-template.typ"
 #import "utils.typ": enum-numbering
+#import "title-templates/isuct.typ": kursovoy-title, nir-title
